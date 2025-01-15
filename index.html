@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salonica Bed Sheets</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    #hero {
+      text-align: center;
+      padding: 20px;
+      background: lightgray;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .product-card {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .actions {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    button {
+      border: none;
+      border-radius: 5px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    #cartDetails {
+      margin: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    form input,
+    form button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 80%;
+    }
+
+    footer {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .social-links a {
+      margin: 0 10px;
+      text-decoration: none;
+      font-size: 20px;
+    }
+
+    .dark {
+      background-color: #333;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>Salonica</div>
+    <nav>
+      <button id="themeToggle">🌙</button>
+    </nav>
+  </header>
+
+  <section id="hero">
+    <h1>Welcome to Salonica</h1>
+    <p>Premium Quality Bed Sheets</p>
+  </section>
+
+  <section id="products">
+    <h2>Our Products</h2>
+    <div class="product-grid" id="productGrid">
+      <!-- Products will load dynamically -->
+    </div>
+  </section>
+
+  <section id="cart">
+    <h2>Your Cart</h2>
+    <div id="cartDetails">
+      <p>Your cart is currently empty.</p>
+    </div>
+    <form id="orderForm">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="text" id="address" placeholder="Your Address" required>
+      <button type="button" id="submitOrder">Place Order</button>
+    </form>
+  </section>
+
+  <section class="payment-methods">
+    <h2>Choose a Payment Method</h2>
+    <button class="easypaisa" onclick="openEasyPaisa()">EasyPaisa</button>
+    <button class="jazzcash" onclick="openJazzCash()">JazzCash</button>
+  </section>
+
+  <footer>
+    <p>Connect with us:</p>
+    <div class="social-links">
+      <a href="https://wa.me/03331417145" target="_blank">WhatsApp</a>
+      <a href="https://instagram.com/salonica70" target="_blank">Instagram</a>
+    </div>
+  </footer>
+
+  <script>
+    const products = Array.from({ length: 20 }, (_, i) => ({
+      id: i + 1,
+      name: `Bed Sheet ${i + 1}`,
+      price: 2000,
+      img: `https://tse3.mm.bing.net/th?id=OIP.2HqyYeI1_Md7vO82YIX8hQHaG9&pid=Api&P=0&h=220${i + 1}`
+    }));
+
+    let cart = {};
+
+    // Load Products
+    const productGrid = document.getElementById('productGrid');
+    const cartDetails = document.getElementById('cartDetails');
+    products.forEach(product => {
+      const productCard = document.createElement('div');
+      productCard.classList.add('product-card');
+      productCard.innerHTML = `
+        <img src="${product.img}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <p>Price: PKR ${product.price}</p>
+        <div class="actions">
+          <button class="minus" data-id="${product.id}">-</button>
+          <span id="quantity-${product.id}">0</span>
+          <button class="plus" data-id="${product.id}">+</button>
+        </div>
+      `;
+      productGrid.appendChild(productCard);
+    });
+
+    // Handle Cart Operations
+    productGrid.addEventListener('click', (e) => {
+      const btn = e.target;
+      const id = btn.dataset.id;
+
+      if (btn.classList.contains('plus')) {
+        cart[id] = (cart[id] || 0) + 1;
+        document.getElementById(`quantity-${id}`).textContent = cart[id];
+      } else if (btn.classList.contains('minus')) {
+        if (cart[id] > 0) {
+          cart[id]--;
+          document.getElementById(`quantity-${id}`).textContent = cart[id];
+          if (cart[id] === 0) delete cart[id];
+        }
+      }
+
+      updateCart();
+    });
+
+    function updateCart() {
+      if (Object.keys(cart).length === 0) {
+        cartDetails.innerHTML = "<p>Your cart is currently empty.</p>";
+        return;
+      }
+
+      let items = "";
+      Object.keys(cart).forEach(id => {
+        items += `<p>${products[id - 1].name} x ${cart[id]}</p>`;
+      });
+      cartDetails.innerHTML = items;
+    }
+
+    // Handle Order Submission
+    document.getElementById('submitOrder').addEventListener('click', () => {
+      const name = document.getElementById('name').value.trim();
+      const address = document.getElementById('address').value.trim();
+
+      if (!name || !address) {
+        alert('Please provide both name and address.');
+        return;
+      }
+
+      if (Object.keys(cart).length === 0) {
+        alert('Your cart is empty.');
+        return;
+      }
+
+      let orderDetails = `Name: ${name}\nAddress: ${address}\nOrder Details:\n`;
+      Object.keys(cart).forEach(id => {
+        orderDetails += `${products[id - 1].name} x ${cart[id]}\n`;
+      });
+
+      // Simulate sending to email
+      alert(`Order sent to sufiyanfaheem281@gmail.com\n\n${orderDetails}`);
+      console.log(orderDetails); // Replace this with backend email functionality
+    });
+
+    // EasyPaisa Payment
+    function openEasyPaisa() {
+      const easyPaisaNumber = "03331417145";
+      const easyPaisaName = "Samreen Shahid";
+      alert(`Please send the payment via EasyPaisa to:\nName: ${easyPaisaName}\nNumber: ${easyPaisaNumber}`);
+      window.location.href = `tel:${easyPaisaNumber}`;
+    }
+
+    // JazzCash Payment
+    function openJazzCash() {
+      const jazzCashNumber = "03006982165";
+      const jazzCashName = "Muhammad Faheem";
+      alert(`Please send the payment via JazzCash to:\nName: ${jazzCashName}\nNumber: ${jazzCashNumber}`);
+      window.location.href = `tel:${jazzCashNumber}`;
+    }
+
+    // Theme Toggle
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+    });
+  </script>
+</body>
+</html>
